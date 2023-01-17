@@ -9,6 +9,7 @@ public class SelectorRing : MonoBehaviour
 	private void Start()
 	{
 		transform.parent = null;
+		spriteTransform.gameObject.SetActive(false);
 	}
 
 	private void OnEnable()

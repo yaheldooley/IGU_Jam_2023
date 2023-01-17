@@ -34,34 +34,58 @@ public class CCMover : MonoBehaviour, IMover
     {
         _move = context.ReadValue<Vector2>();
 	}
-
-
+    [Range(0, 1)]
+    [SerializeField] float xInputSensitivity = .3f;
     Vector2 _move = Vector2.zero;
     float _velocity = 0;
     //Vector3 _lastMovement = new Vector3(-.5f, 0, -.5f);
     float _currentSpeed = 0;
+    bool kneeling = false;
 	void Update()
     {
-
-        Vector3 movementInput = Quaternion.Euler(0,_brain.ActiveVirtualCamera.VirtualCameraGameObject.transform.eulerAngles.y, 0) * new Vector3(_move.x, 0, _move.y);
-        Vector3 movementDir = movementInput.normalized;
-        float spd = movementDir.magnitude * maxSpeed;
-        float newSpeed = Mathf.Lerp(_currentSpeed, spd, Time.deltaTime * 8);
-        _anim.SetFloat("speed", newSpeed / maxSpeed);
-        _currentSpeed = newSpeed;
-        //Debug.Log("Speed = " + spd.ToString());
-
-        if (movementDir != Vector3.zero)
+        if (_move.y < 0)
         {
-            Quaternion desiredRot = Quaternion.LookRotation(movementDir, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, desiredRot, turnSpeed * Time.deltaTime);
+            if(_move.x > -xInputSensitivity && _move.x < xInputSensitivity )
+            {
+                if(!kneeling)
+                {
+                    kneeling = true;
+                    // kneeling animation
+                }
+
+                _anim.SetFloat("speed", 0);
+                _currentSpeed = 0;
+            }
+            _move.y = 0;
+
+        }
+        else if(kneeling && _move.y > 0)
+        {
+            kneeling = false;
+            // stand up animation
 		}
-         
-        if (controller.isGrounded) _velocity = -.02f;
-        else _velocity += gravity * Time.deltaTime;
-        movementDir.y = _velocity;
-        controller.Move(movementDir * maxSpeed * Time.deltaTime);
-        
+        if(!kneeling)
+        {
+            float camYRot = _brain.ActiveVirtualCamera.VirtualCameraGameObject.transform.eulerAngles.y;
+            Vector3 movementInput = Quaternion.Euler(0, camYRot, 0) * new Vector3(Mathf.Clamp(_move.x, -xInputSensitivity, xInputSensitivity), 0, _move.y);
+            Vector3 movementDir = movementInput.normalized;
+            float spd = movementDir.magnitude * maxSpeed;
+            float newSpeed = Mathf.Lerp(_currentSpeed, spd, Time.deltaTime * 8);
+            _anim.SetFloat("speed", newSpeed / maxSpeed);
+            _currentSpeed = newSpeed;
+            //Debug.Log("Speed = " + spd.ToString());
+
+            if (movementDir != Vector3.zero)
+            {
+                Quaternion desiredRot = Quaternion.LookRotation(movementDir, Vector3.up);
+                transform.rotation = Quaternion.Slerp(transform.rotation, desiredRot, turnSpeed * Time.deltaTime);
+            }
+
+            if (controller.isGrounded) _velocity = -.02f;
+            else _velocity += gravity * Time.deltaTime;
+            movementDir.y = _velocity;
+            controller.Move(movementDir * maxSpeed * Time.deltaTime);
+        }
     }
     
     
