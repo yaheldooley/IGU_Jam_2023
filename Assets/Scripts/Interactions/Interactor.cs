@@ -5,6 +5,37 @@ using System.Linq;
 
 public class Interactor : MonoBehaviour
 {
+	[SerializeField] SelectorRing selectorRing;
+	private PlayerController _controller;
+
+	private void Awake()
+	{
+		_controller = GetComponent<PlayerController>();
+	}
+
+	private void OnEnable()
+	{
+		IInteract.InteractionComplete += InteractionComplete;
+	}
+
+	private void OnDisable()
+	{
+		IInteract.InteractionComplete -= InteractionComplete;
+	}
+
+	private void InteractionComplete(IInteract action)
+	{
+		if (action == _currentInteraction)
+		{
+			_currentInteraction = null;
+			_controller.SetControlState(PlayerController.ControlState.Character);
+			if (interactionsAvailable.ContainsKey(action.Transform.gameObject)) interactionsAvailable.Remove(action.Transform.gameObject);
+			HighlightNearestInteraction();
+		}
+	}
+
+	private IInteract _currentInteraction;
+	private IInteract _nearestAvailable;
 	private Dictionary<GameObject, IInteract> interactionsAvailable = new Dictionary<GameObject, IInteract>();
 	private void OnTriggerEnter(Collider other)
 	{
@@ -14,6 +45,7 @@ public class Interactor : MonoBehaviour
 			if (i == null) return;
 			interactionsAvailable.Add(other.gameObject, i);
 			i.InteractorEnter();
+			HighlightNearestInteraction();
 			//Debug.Log($"Has interact with {other.gameObject.name}");
 		}
 	}
@@ -28,6 +60,7 @@ public class Interactor : MonoBehaviour
 				interactionsAvailable.Remove(other.gameObject);
 				//Debug.Log($"Interact removed {other.gameObject.name}");
 			}
+			HighlightNearestInteraction();
 		}
 	}
 
@@ -45,9 +78,33 @@ public class Interactor : MonoBehaviour
 		} 
 	}
 
-	public IInteract DoInteraction()
+	public void DoInteraction()
 	{
-		var avail = interactionsAvailable.Values.Where(x=> x.CanUse).ToList();
+		if (_currentInteraction == null && _nearestAvailable != null)
+		{
+			_controller.SetControlState(PlayerController.ControlState.Interactor);
+			_currentInteraction = _nearestAvailable;
+			selectorRing.enabled = false;
+			_currentInteraction.BeginInteract();
+		}
+	}
+	private void HighlightNearestInteraction()
+	{
+		_nearestAvailable = GetClosestAvailableAction();
+		if (_nearestAvailable != null)
+		{
+			selectorRing.SetRingPosition(_nearestAvailable);
+			selectorRing.enabled = true;
+		}
+		else
+		{
+			selectorRing.enabled = false;
+		}
+	}
+
+	private IInteract GetClosestAvailableAction()
+	{
+		var avail = interactionsAvailable.Values.Where(x => x.CanUse).ToList();
 		int totalAvail = avail.Count();
 		if (totalAvail < 1) return null;
 		if (totalAvail == 1) return avail[0];
@@ -59,5 +116,7 @@ public class Interactor : MonoBehaviour
 	{
 		interactions.OrderBy(x => Vector3.Distance(transform.position, x.Transform.position)).ToList();
 	}
+
+	
 	
 }

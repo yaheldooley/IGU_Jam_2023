@@ -59,7 +59,7 @@ public class CCMover : MonoBehaviour, IMover
          
         if (controller.isGrounded) _velocity = -.02f;
         else _velocity += gravity * Time.deltaTime;
-        movementInput.y = _velocity;
+        movementDir.y = _velocity;
         controller.Move(movementDir * maxSpeed * Time.deltaTime);
         
     }

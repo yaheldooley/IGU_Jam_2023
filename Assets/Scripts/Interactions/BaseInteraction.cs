@@ -16,6 +16,10 @@ public class BaseInteraction : MonoBehaviour, IInteract
 	public bool InUse { get => _inUse; }
 
 	public Transform Transform => this.transform;
+	[SerializeField] Transform selectorTransform;
+	public Transform SelectorTransform => selectorTransform;
+
+	public float SelectorSize => throw new System.NotImplementedException();
 
 	public virtual bool BeginInteract()
 	{
