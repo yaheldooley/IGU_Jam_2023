@@ -41,31 +41,41 @@ public class CCMover : MonoBehaviour, IMover
     //Vector3 _lastMovement = new Vector3(-.5f, 0, -.5f);
     float _currentSpeed = 0;
     bool kneeling = false;
+
 	void Update()
     {
-        if (_move.y < 0)
+        if(!waitingForMove)
         {
-            if(_move.x > -xInputSensitivity && _move.x < xInputSensitivity )
+            if (_move.y < 0)
             {
-                if(!kneeling)
+                if (_move.y < -.3f && _move.x > -xInputSensitivity && _move.x < xInputSensitivity)
                 {
-                    kneeling = true;
-                    // kneeling animation
+                    _anim.SetFloat("speed", 0);
+                    _currentSpeed = 0;
+
+                    if (!kneeling)
+                    {
+                        kneeling = true;
+                        _anim.SetBool("kneel", true);
+                        StartCoroutine(WaitForMovement(1f));
+                    }
                 }
+                _move.y = 0;
 
-                _anim.SetFloat("speed", 0);
-                _currentSpeed = 0;
             }
-            _move.y = 0;
+            else if (_move.y > .3f)
+            {
+                if (_move.x > -xInputSensitivity && _move.x < xInputSensitivity)
+                {
+                    if (kneeling)
+                    {
+                        kneeling = false;
+                        _anim.SetBool("kneel", false);
+                        StartCoroutine(WaitForMovement(1f));
+                    }
+                }
+            }
 
-        }
-        else if(kneeling && _move.y > 0)
-        {
-            kneeling = false;
-            // stand up animation
-		}
-        if(!kneeling)
-        {
             float camYRot = _brain.ActiveVirtualCamera.VirtualCameraGameObject.transform.eulerAngles.y;
             Vector3 movementInput = Quaternion.Euler(0, camYRot, 0) * new Vector3(Mathf.Clamp(_move.x, -xInputSensitivity, xInputSensitivity), 0, _move.y);
             Vector3 movementDir = movementInput.normalized;
@@ -84,11 +94,28 @@ public class CCMover : MonoBehaviour, IMover
             if (controller.isGrounded) _velocity = -.02f;
             else _velocity += gravity * Time.deltaTime;
             movementDir.y = _velocity;
+            if (kneeling)
+            {
+                movementDir.x = 0;
+                movementDir.z = 0;
+            }
             controller.Move(movementDir * maxSpeed * Time.deltaTime);
         }
     }
-    
-    
+
+    bool waitingForMove = false;
+    IEnumerator WaitForMovement(float time)
+    {
+        waitingForMove = true;
+        float elapsedTime = 0;
+        while(elapsedTime < time)
+        {
+            elapsedTime += Time.deltaTime;
+            yield return null;
+		}
+        waitingForMove = false;
+	}
+
 
     public void EnableMovement()
     {

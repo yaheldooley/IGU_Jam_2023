@@ -8,8 +8,9 @@ public class SelectorRing : MonoBehaviour
 	[SerializeField] Transform parentTransform;
 	private void Start()
 	{
+		CameraTracker.BrainReference(Camera.main.GetComponent<Cinemachine.CinemachineBrain>());
 		transform.parent = null;
-		spriteTransform.gameObject.SetActive(false);
+		this.enabled = false;
 	}
 
 	private void OnEnable()
@@ -26,8 +27,10 @@ public class SelectorRing : MonoBehaviour
 	void Update()
     {
 		var eul = spriteTransform.localEulerAngles;
-		eul.y += Time.deltaTime * rotationSpeed;
+		eul.z += Time.deltaTime * rotationSpeed;
 		spriteTransform.localEulerAngles = eul;
+		var camTrans = CameraTracker.ActiveCameraTransform;
+		if(camTrans) parentTransform.LookAt(camTrans);
     }
 
 	public void SetRingPosition(IInteract action)
@@ -35,5 +38,6 @@ public class SelectorRing : MonoBehaviour
 		this.transform.position = action.SelectorTransform.position;
 		this.transform.rotation = action.SelectorTransform.rotation;
 		spriteTransform.localScale = new Vector3(action.SelectorSize, action.SelectorSize, action.SelectorSize);
+
 	}
 }
