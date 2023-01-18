@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -98,4 +99,13 @@ public static class Helpers
     {
         return (float)(System.Math.Truncate((double)f * 100.0) / 100.0);
     }
+
+    public static Transform GetNearestTransform(List<Transform> trans, Vector3 startPosition)
+    {
+        if (trans.Count < 1) return null;
+        trans.OrderBy(x => Vector3.Distance(startPosition, x.position)).ToList();
+        return trans[0];
+    }
+
+
 }

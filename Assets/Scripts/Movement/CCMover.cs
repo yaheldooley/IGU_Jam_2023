@@ -115,8 +115,6 @@ public class CCMover : MonoBehaviour, IMover
 		}
         waitingForMove = false;
 	}
-
-
     public void EnableMovement()
     {
         controller.enabled = false;

@@ -21,7 +21,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  UseDitherPattern: 1
+  UseDitherPattern: 0
   DitherPattern: {fileID: 11400000, guid: 665add148214f504fb57f8e4d6317dee, type: 2}
   GeneratedFileName: 
   AutoGenerateFileName: 1
