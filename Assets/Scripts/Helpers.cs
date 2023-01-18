@@ -107,5 +107,12 @@ public static class Helpers
         return trans[0];
     }
 
-
+    public static float NearestMultipleOfNumber(float value, float multiple)
+    {
+        var rem = value % multiple;
+        var result = value - rem;
+        if (rem >= (multiple / 2))
+            result += multiple;
+        return result;
+    }
 }

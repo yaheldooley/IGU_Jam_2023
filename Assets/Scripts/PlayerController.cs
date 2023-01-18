@@ -13,12 +13,17 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] Interactor _interactor;
 
 	[SerializeField] CinemachineInputProvider _cinemachineLookInput;
+	
 	private void Start()
 	{
 		SetControlState(ControlState.Character);
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 	}
+
+	
+
+	
 	public enum ControlState
 	{
 		Character,
@@ -50,15 +55,7 @@ public class PlayerController : MonoBehaviour
 
 	}
 
-	private void OnTriggerEnter(Collider other)
-	{
-
-	}
-
-	private void OnTriggerExit(Collider other)
-	{
-		
-	}
+	
 
 
 }

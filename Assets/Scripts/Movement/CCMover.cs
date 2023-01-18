@@ -11,7 +11,7 @@ public class CCMover : MonoBehaviour, IMover
     [SerializeField] float maxSpeed = 5;
     float gravity = -25f;
     [SerializeField] float turnSpeed = 6f;
-
+    public bool IsMoving { get{ return controller.velocity.magnitude > .2f; } }
     CinemachineBrain _brain;
     PlayerAnimator _anim;
 	private void Start()
@@ -40,42 +40,11 @@ public class CCMover : MonoBehaviour, IMover
     float _velocity = 0;
     //Vector3 _lastMovement = new Vector3(-.5f, 0, -.5f);
     float _currentSpeed = 0;
-    bool kneeling = false;
 
 	void Update()
     {
         if(!waitingForMove)
         {
-            if (_move.y < 0)
-            {
-                if (_move.y < -.3f && _move.x > -xInputSensitivity && _move.x < xInputSensitivity)
-                {
-                    _anim.SetFloat("speed", 0);
-                    _currentSpeed = 0;
-
-                    if (!kneeling)
-                    {
-                        kneeling = true;
-                        _anim.SetBool("kneel", true);
-                        StartCoroutine(WaitForMovement(1f));
-                    }
-                }
-                _move.y = 0;
-
-            }
-            else if (_move.y > .3f)
-            {
-                if (_move.x > -xInputSensitivity && _move.x < xInputSensitivity)
-                {
-                    if (kneeling)
-                    {
-                        kneeling = false;
-                        _anim.SetBool("kneel", false);
-                        StartCoroutine(WaitForMovement(1f));
-                    }
-                }
-            }
-
             float camYRot = _brain.ActiveVirtualCamera.VirtualCameraGameObject.transform.eulerAngles.y;
             Vector3 movementInput = Quaternion.Euler(0, camYRot, 0) * new Vector3(Mathf.Clamp(_move.x, -xInputSensitivity, xInputSensitivity), 0, _move.y);
             Vector3 movementDir = movementInput.normalized;
@@ -94,11 +63,6 @@ public class CCMover : MonoBehaviour, IMover
             if (controller.isGrounded) _velocity = -.02f;
             else _velocity += gravity * Time.deltaTime;
             movementDir.y = _velocity;
-            if (kneeling)
-            {
-                movementDir.x = 0;
-                movementDir.z = 0;
-            }
             controller.Move(movementDir * maxSpeed * Time.deltaTime);
         }
     }

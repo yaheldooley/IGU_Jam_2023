@@ -84,6 +84,7 @@ public class Enemy : MonoBehaviour
 				break;
 
 			case EnemyState.Hostile:
+				LookAtTarget();
 				if (EngagingATargetWithinRange())
 				{
 					return;
@@ -100,6 +101,7 @@ public class Enemy : MonoBehaviour
 				break;
 
 			case EnemyState.Attack:
+				LookAtTarget();
 				//CanvasManager.Instance.text.text = $"Attacking is: {_attacker.Attacking}";
 				if (!_attacker.Attacking)
 				{
@@ -112,7 +114,8 @@ public class Enemy : MonoBehaviour
 	private bool EngagingATargetWithinRange()
 	{
 		if (_state == EnemyState.Disabled) return false;
-
+		
+		
 		if (_state != EnemyState.Attack && _attackRange.AllInRange.Count > 0 && !_attacker.Attacking)
 		{
 			_state = EnemyState.Attack;
@@ -123,6 +126,14 @@ public class Enemy : MonoBehaviour
 		return false;
 	}
 
+	private void LookAtTarget()
+	{
+		if (targetTransform)
+		{
+			Vector3 lookRot = new Vector3(targetTransform.position.x, transform.position.y, targetTransform.position.z);
+			transform.LookAt(lookRot);
+		}
+	}
 
 	public enum EnemyState
 	{
