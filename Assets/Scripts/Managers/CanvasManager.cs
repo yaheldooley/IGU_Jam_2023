@@ -1,3 +1,4 @@
+using FMODUnity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,10 +37,12 @@ public class CanvasManager : MonoBehaviour
 		chargingIcon.enabled = chargeDisplayed;
 	}
 
+	float lastChargeValue = 0;
 	public void SetBatteryLevel(float value, float maxValue)
 	{
 		batteryLevelSlider.maxValue = maxValue;
-		var result = Helpers.NearestMultipleOfNumber(value / maxValue, .125f);
+		lastChargeValue = value / maxValue;
+		var result = Helpers.NearestMultipleOfNumber(lastChargeValue, .125f);
 		//Debug.Log(result * 10);
 		batteryLevelSlider.value = result * 10;
 		if(result < .13f) batteryLevelFill.color = Color.red;
@@ -47,11 +50,15 @@ public class CanvasManager : MonoBehaviour
 		else batteryLevelFill.color = Color.white;
 	}
 	[SerializeField] float flashSpeed = 3;
+	[SerializeField] StudioEventEmitter chargingEmitter;
 	IEnumerator FlashChargeImage()
 	{
 		batteryLevelFill.color = Helpers.ChangeColorAlpha(batteryLevelFill.color, 1);
 		bool fadeDown = true;
 		float timeElapsed = 0;
+		chargingEmitter.Params[0].Value = lastChargeValue;
+		chargingEmitter.Play();
+		
 		while(chargeDisplayed)
 		{
 			timeElapsed += Time.deltaTime;
@@ -63,6 +70,8 @@ public class CanvasManager : MonoBehaviour
 			batteryLevelFill.color = Helpers.ChangeColorAlpha(batteryLevelFill.color, alpha);
 			if (timeElapsed >= flashSpeed)
 			{
+				chargingEmitter.Params[0].Value = 1 - lastChargeValue;
+				chargingEmitter.Play();
 				timeElapsed = 0;
 				fadeDown = !fadeDown;
 			}

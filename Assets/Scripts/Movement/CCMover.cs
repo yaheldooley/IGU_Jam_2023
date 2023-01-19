@@ -12,6 +12,7 @@ public class CCMover : MonoBehaviour, IMover
     float gravity = -25f;
     [SerializeField] float turnSpeed = 6f;
     public bool IsMoving { get{ return controller.velocity.magnitude > .2f; } }
+    public float MoveSpeedNormalized { get { return controller.velocity.magnitude / maxSpeed; } }
     CinemachineBrain _brain;
     PlayerAnimator _anim;
 	private void Start()
