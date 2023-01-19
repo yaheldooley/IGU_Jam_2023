@@ -35,7 +35,7 @@ public class BatteryHandler : MonoBehaviour
 		var decayThisFrame = _mover.IsMoving ? -decayRateWhileMoving : -decayRate;
 		if (LightZonesAvailable.Count > 0) decayThisFrame = DetermineChargeLevelThisFrame();
 		batteryRemaining += Time.deltaTime * decayThisFrame;
-
+		batteryRemaining = Mathf.Clamp(batteryRemaining, 0, batteryMax);
 		if(!isCharging && decayThisFrame > 0 || isCharging && decayThisFrame < 0)
 		{
 			isCharging = !isCharging;
