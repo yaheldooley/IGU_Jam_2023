@@ -56,7 +56,7 @@ public class CanvasManager : MonoBehaviour
 		batteryLevelFill.color = Helpers.ChangeColorAlpha(batteryLevelFill.color, 1);
 		bool fadeDown = true;
 		float timeElapsed = 0;
-		chargingEmitter.Params[0].Value = lastChargeValue;
+		chargingEmitter.SetParameter("chargeLoudness", 1);
 		chargingEmitter.Play();
 		
 		while(chargeDisplayed)

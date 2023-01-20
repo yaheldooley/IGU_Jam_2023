@@ -30,4 +30,6 @@ public class GameManager : MonoBehaviour
 		// Hide progress bar
 		// set players position etc
 	}
+
+
 }

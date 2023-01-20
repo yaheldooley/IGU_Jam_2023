@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Interact
   - LightZone
+  - LightSwitcher
   layers:
   - Default
   - TransparentFX

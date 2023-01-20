@@ -57,6 +57,25 @@ public class Enemy : MonoBehaviour
 	}
 
 	private EnemyState _state;
+
+	bool _hostile = false;
+	private void IsHostile(bool hostile)
+	{
+		_hostile = hostile;
+		if (hostile)
+		{
+
+			if (!EnemiesHostile.Contains(this)) EnemiesHostile.Add(this);
+			if (MusicPlayer.Instance) MusicPlayer.Instance.SetThreatLevel(1);
+		}
+
+		else
+		{
+			if (EnemiesHostile.Contains(this)) EnemiesHostile.Remove(this);
+			if (EnemiesHostile.Count < 1 && MusicPlayer.Instance) MusicPlayer.Instance.SetThreatLevel(0);
+		}
+	}
+
 	private void Update()
 	{
 		switch(_state)
@@ -65,6 +84,7 @@ public class Enemy : MonoBehaviour
 				return;
 
 			case EnemyState.Idle:
+				if (_hostile) IsHostile(false);
 				if (_targetInRange)
 				{
 					if (EngagingATargetWithinRange())
@@ -75,6 +95,7 @@ public class Enemy : MonoBehaviour
 					{
 						targetTransform = Helpers.GetNearestTransform(_view.visibleTargets, transform.position);
 						_state = EnemyState.Hostile;
+						IsHostile(true);
 					}
 				}
 				else
@@ -95,7 +116,7 @@ public class Enemy : MonoBehaviour
 				}
 				else
 				{
-					_state = EnemyState.Idle; 
+					_state = EnemyState.Idle;
 					return;
 				}
 				break;
@@ -111,6 +132,9 @@ public class Enemy : MonoBehaviour
 				break;
 		}
 	}
+
+	
+
 	private bool EngagingATargetWithinRange()
 	{
 		if (_state == EnemyState.Disabled) return false;
@@ -119,6 +143,7 @@ public class Enemy : MonoBehaviour
 		if (_state != EnemyState.Attack && _attackRange.AllInRange.Count > 0 && !_attacker.Attacking)
 		{
 			_state = EnemyState.Attack;
+			
 			_mover.DisableMovement();
 			_attacker.Attack(Random.Range(0,5), transform.position);
 			return true;
@@ -146,5 +171,7 @@ public class Enemy : MonoBehaviour
 	// Idle
 	// Has sight to player chase
 	// If within attack range, stop mover, attack animation
-	
+
+	public static List<Enemy> EnemiesHostile = new List<Enemy>();
+
 }

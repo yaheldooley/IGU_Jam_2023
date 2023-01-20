@@ -11,7 +11,9 @@ public class PlayerSounds : MonoBehaviour
 
 	public void StartStep()
 	{
-		startStepEmitter.Params[0].Value = _mover.MoveSpeedNormalized;
+		var speed = _mover.MoveSpeedNormalized;
+		if (speed < .1f) speed = 0;
+		startStepEmitter.SetParameter("chargeLoudness", speed);
 		startStepEmitter.Play();
 	}
 
