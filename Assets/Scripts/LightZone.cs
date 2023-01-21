@@ -1,3 +1,4 @@
+using FMODPlus;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,9 @@ public class LightZone : MonoBehaviour
 
 	[SerializeField] Light _light;
 	[SerializeField] UnityEngine.AI.NavMeshObstacle _obstacle;
-	[SerializeField] FMODUnity.StudioEventEmitter generatorSfx;
+
+	[SerializeField] FMOD_Studio3DEvent generatorRunSfx;
+
 	private void Start()
 	{
 		Radius = GetComponent<SphereCollider>().radius;
@@ -26,9 +29,9 @@ public class LightZone : MonoBehaviour
 	public void SwitchOn()
 	{
 		HasPower = true;
-		if (generatorSfx)
+		if (!generatorRunSfx.eventReference.IsNull)
 		{
-			generatorSfx.Play();
+			FMOD_Studio3DEvent.Start(generatorRunSfx, this.gameObject);
 			StartCoroutine(WaitForLight());
 		}
 		else _light.enabled = true;

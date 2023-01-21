@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BatteryHandler : MonoBehaviour
 {
+	[SerializeField] Light headlamp;
+
 	public float batteryMax = 10;
 	public float batteryRemaining = 10;
 	public float decayRate = .01f;
@@ -33,16 +35,22 @@ public class BatteryHandler : MonoBehaviour
 	private void Update()
 	{
 		var decayThisFrame = _mover.IsMoving ? -decayRateWhileMoving : -decayRate;
+		if (headlamp.enabled) decayThisFrame += -.32f;
 		if (LightZonesAvailable.Count > 0) decayThisFrame = DetermineChargeLevelThisFrame();
 		batteryRemaining += Time.deltaTime * decayThisFrame;
 		batteryRemaining = Mathf.Clamp(batteryRemaining, 0, batteryMax);
-		if(!isCharging && decayThisFrame > 0 || isCharging && decayThisFrame < 0)
+
+		if (batteryRemaining <= 0.5f && GameManager.Instance) 
+			GameManager.Instance.ChangeGameState(GameManager.GameState.Death);
+
+		if (!isCharging && decayThisFrame > 0 || isCharging && decayThisFrame < 0)
 		{
 			isCharging = !isCharging;
 			if (CanvasManager.Instance) CanvasManager.Instance.DisplayChargeIsHappening(isCharging);
 		}
-
+		
 	}
+
 	bool _updateCycle = false;
 	IEnumerator UpdateBatteryLevelOnHUD()
 	{

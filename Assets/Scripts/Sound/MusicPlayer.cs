@@ -40,5 +40,9 @@ public class MusicPlayer : MonoBehaviour
         musicEmitter.SetParameter("ThreatLevel", _threatLevel);
     }
 
-    
+	public void PauseGameMusic(bool pause)
+	{
+        musicEmitter.EventInstance.setPaused(pause);
+        if (!pause && musicEmitter.IsPlaying()) musicEmitter.Play();
+	}
 }

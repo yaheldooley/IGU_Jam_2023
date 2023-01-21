@@ -26,6 +26,7 @@ public class Generator : MonoBehaviour, IInteract
 		StartCoroutine(AddGas());
 		return true;
 	}
+
 	private float _fillTime = 3;
 	private IEnumerator AddGas()
 	{

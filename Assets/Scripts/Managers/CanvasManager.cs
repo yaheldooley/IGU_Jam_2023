@@ -80,4 +80,67 @@ public class CanvasManager : MonoBehaviour
 		}
 		batteryLevelFill.color = Helpers.ChangeColorAlpha(batteryLevelFill.color, 1);
 	}
+
+	[SerializeField] GameObject deathPanel;
+	[SerializeField] Image deathPanelImage;
+	[SerializeField] TextMeshProUGUI deathPoemText;
+	[SerializeField] Button[] deathButtons;
+	[SerializeField] TextMeshProUGUI[] deathButtonTexts;
+	public void ShowDeathScreen()
+	{
+		StartCoroutine(DeathScreenSequence());
+	}
+
+	IEnumerator DeathScreenSequence()
+	{
+		deathPanelImage.color = Helpers.ChangeColorAlpha(deathPanelImage.color, 0);
+		deathPoemText.color = Helpers.ChangeColorAlpha(deathPoemText.color, 0);
+		foreach (var text in deathButtonTexts) text.color = Helpers.ChangeColorAlpha(text.color, 0);
+		foreach (var button in deathButtons) button.enabled = false;
+		List<Image> buttonImages = new List<Image>();
+		foreach (var button in deathButtons) buttonImages.Add(button.GetComponent<Image>());
+		foreach (var image in buttonImages) image.color = Helpers.ChangeColorAlpha(image.color, 0);
+		deathPanel.SetActive(true);
+		
+		float timeElapsed = 0;
+		float fadeUpTime = 1f;
+		// fade up death panel BG image
+		while (timeElapsed < fadeUpTime)
+		{
+			timeElapsed += Time.deltaTime;
+			deathPanelImage.color = Helpers.ChangeColorAlpha(deathPanelImage.color, timeElapsed / fadeUpTime);
+			yield return null;
+		}
+		// fade up poem
+		timeElapsed = 0;
+		while (timeElapsed < fadeUpTime)
+		{
+			timeElapsed += Time.deltaTime;
+			deathPoemText.color = Helpers.ChangeColorAlpha(deathPoemText.color, timeElapsed / fadeUpTime);
+			yield return null;
+		}
+		// fade up button texts
+		timeElapsed = 0;
+		while (timeElapsed < fadeUpTime)
+		{
+			timeElapsed += Time.deltaTime;
+			foreach (var text in deathButtonTexts) text.color = Helpers.ChangeColorAlpha(text.color, timeElapsed/fadeUpTime);
+			foreach (var image in buttonImages) image.color = Helpers.ChangeColorAlpha(image.color, (timeElapsed / fadeUpTime) / 2);
+			yield return null;
+		}
+		foreach (var button in deathButtons) button.enabled = true;
+		
+	}
+
+	public void TryAgain()
+	{
+		if (GameManager.Instance) GameManager.Instance.ReloadSceneFromLast();
+	}
+
+	public void QuitApp()
+	{
+		if (GameManager.Instance) GameManager.Instance.QuitApp();
+		
+	}
+	
 }

@@ -62,18 +62,8 @@ public class Enemy : MonoBehaviour
 	private void IsHostile(bool hostile)
 	{
 		_hostile = hostile;
-		if (hostile)
-		{
-
-			if (!EnemiesHostile.Contains(this)) EnemiesHostile.Add(this);
-			if (MusicPlayer.Instance) MusicPlayer.Instance.SetThreatLevel(1);
-		}
-
-		else
-		{
-			if (EnemiesHostile.Contains(this)) EnemiesHostile.Remove(this);
-			if (EnemiesHostile.Count < 1 && MusicPlayer.Instance) MusicPlayer.Instance.SetThreatLevel(0);
-		}
+		if (hostile) EnemyManager.AddToHostileList(this);
+		else EnemyManager.RemoveFromHostileList(this);
 	}
 
 	private void Update()
@@ -172,6 +162,6 @@ public class Enemy : MonoBehaviour
 	// Has sight to player chase
 	// If within attack range, stop mover, attack animation
 
-	public static List<Enemy> EnemiesHostile = new List<Enemy>();
+	
 
 }

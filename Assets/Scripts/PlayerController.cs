@@ -11,19 +11,28 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] AudioSource _source;
 	[SerializeField] CCMover _mover;
 	[SerializeField] Interactor _interactor;
-
-	[SerializeField] CinemachineInputProvider _cinemachineLookInput;
 	
 	private void Start()
 	{
+		if (GameManager.Instance) GameManager.Instance.player = this;
 		SetControlState(ControlState.Character);
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 	}
 
-	
+	public void Dead()
+	{
+		_mover.enabled = false;
+		_interactor.enabled = false;
+		GetComponent<BatteryHandler>().enabled = false;
+	}
 
-	
+	public void Revive()
+	{
+		
+	}
+
+
 	public enum ControlState
 	{
 		Character,
@@ -38,13 +47,13 @@ public class PlayerController : MonoBehaviour
 		{
 			case ControlState.Character:
 				_interactor.enabled = false;
-				_cinemachineLookInput.enabled = true;
+
 				_mover.enabled = true;
 				break;
 
 			case ControlState.Interactor:
 				_mover.enabled = false;
-				_cinemachineLookInput.enabled = false;
+
 				_interactor.enabled = true;
 				break;
 		}
